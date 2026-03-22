@@ -2,7 +2,7 @@
 
 [![VSCode Marketplace](https://img.shields.io/visual-studio-marketplace/v/owsam22.pocket-preview?color=blue&label=VS%20Code%20Extension)](https://marketplace.visualstudio.com/items?itemName=owsam22.pocket-preview)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/owsam22/pocket-preview?color=yellow)](https://github.com/owsam22/pocket-preview-vscode-extention)
+[![GitHub ](https://img.shields.io/github/stars/owsam22/pocket-preview?color=yellow)](https://github.com/owsam22/pocket-preview-vscode-extention)
 
 > Preview your local dev server instantly on any device with a QR code.
 
@@ -27,6 +27,8 @@
 - 🔄 Automatic live reload on file changes  
 - ⚡ Supports **React**, **Vite**, and plain **HTML**  
 - 🚀 One-command start  
+- ⚙️ Automatically detects dev server port
+- 🟢 Checks for CloudFlred installation and guide users
 
 ---
 
@@ -39,7 +41,7 @@ Search **Pocket Preview** → click **Install**
 ### 2. Manual Install
 
 ```bash
-code --install-extension pocket-preview-0.0.1.vsix
+code --install-extension pocket-preview-0.0.6.vsix
 ```
 
 ---
@@ -49,6 +51,8 @@ code --install-extension pocket-preview-0.0.1.vsix
 * Node.js installed
 * Dev server running (`npm run dev`)
 * Cloudflare Tunnel (`cloudflared`) installed & in PATH
+
+if CloudFlared is not found ,the extention will prompt you to download it : [download cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)
 
 > Tunnel generates a public URL for your preview.
 
@@ -118,6 +122,9 @@ Preview on Phone
 * Check `allowedHosts` in `vite.config.js`
 * Restart server after changes
 
+**Cloudflared not detected**
+
+* install from [cloudflared downloads](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)
 ---
 
 ## 📌 Notes
