@@ -3,7 +3,7 @@
   "displayName": "pocket-preview",
   "description": "a live preview setup for quick access oven any network or phone",
   "icon": "public/icon.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.110.0"
   },

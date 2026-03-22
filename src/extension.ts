@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import { detectPort } from "./portDetector";
 import { startTunnel } from "./tunnelManager";
 import * as QRCode from "qrcode";
+import { checkCloudflared } from "./cloudFlareChecker";
+
 
 
 
@@ -11,6 +13,11 @@ export function activate(context: vscode.ExtensionContext) {
     "pocketpreview.start",
     async () => {
       try {
+        const isInstalled = await checkCloudflared();
+
+        if (!isInstalled) {
+        return ;
+        }
         vscode.window.showInformationMessage("🔍 Detecting dev server...");
 
         const port = await detectPort();
@@ -24,7 +31,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         const publicUrl = await startTunnel(port);
 
-        const qr =await QRCode.toDataURL(publicUrl);
+        let qr = "";
+        try {   
+        qr = await QRCode.toDataURL(publicUrl);
+        } catch {
+        qr = "";
+            vscode.window.showWarningMessage("⚠️ Failed to generate QR code, URL will still be shown.");
+        }
 
         const panel = vscode.window.createWebviewPanel(
           "pocketPreview",
@@ -34,18 +47,147 @@ export function activate(context: vscode.ExtensionContext) {
             enableScripts: true,
           }
         );
-        panel.webview.html = `
-        <html>
-          <body style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
-            <h1>📱 Scan to Preview</h1>
-            <img src="${qr}" alt="QR Code" />
-          </body>
-        </html>
+panel.webview.html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: var(--vscode-font-family);
+      color: var(--vscode-foreground);
+      background-color: var(--vscode-editor-background);
+    }
 
-        <button onclick="navigator.clipboard.writeText('${publicUrl}')" style="position:absolute; bottom:20px; padding:10px 20px; font-size:16px; cursor:pointer;">
-          Copy URL
-        </button>
-        `;
+    .container {
+      text-align: center;
+      padding: 24px;
+      border-radius: 8px;
+      background: var(--vscode-welcomePage-tileBackground);
+      border: 1px solid var(--vscode-widget-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      max-width: 320px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: var(--vscode-settings-headerForeground);
+    }
+
+    #qr-wrapper {
+      background: white; /* Necessary for QR scanning reliability */
+      padding: 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    #qr {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+
+    .url-box {
+      background: var(--vscode-textCodeBlock-background);
+      padding: 8px;
+      border-radius: 4px;
+      font-family: var(--vscode-editor-font-family);
+      font-size: 0.85rem;
+      word-break: break-all;
+      margin-bottom: 16px;
+      border: 1px solid var(--vscode-panel-border);
+    }
+
+    a {
+      color: var(--vscode-textLink-foreground);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      background: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      border-radius: 2px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--vscode-button-hoverBackground);
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--vscode-descriptionForeground);
+      line-height: 1.4;
+    }
+
+    .error-text {
+      color: var(--vscode-errorForeground);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📱 Pocket Preview</h1>
+    
+    <div id="qr-wrapper">
+      <img id="qr" src="${qr}" alt="QR Code" />
+    </div>
+
+    <div class="url-box">
+      <a href="${publicUrl}" target="_blank" id="urlText">${publicUrl}</a>
+    </div>
+
+    <button id="copyBtn">Copy URL</button>
+
+    <div class="footer-note">
+      <span class="error-text">Link not working?</span><br>
+      Run the <b>Pocket Preview</b> command again to regenerate the tunnel.
+    </div>
+  </div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    const copyBtn = document.getElementById('copyBtn');
+
+    copyBtn.addEventListener('click', () => {
+      const url = document.getElementById('urlText').innerText;
+      navigator.clipboard.writeText(url);
+      
+      // Visual feedback
+      const originalText = copyBtn.innerText;
+      copyBtn.innerText = '✅ Copied to Clipboard';
+      copyBtn.style.background = 'var(--vscode-button-secondaryBackground)';
+      
+      setTimeout(() => {
+        copyBtn.innerText = originalText;
+        copyBtn.style.background = 'var(--vscode-button-background)';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
+`;
 
         console.log("FINAL URL:", publicUrl);
 
