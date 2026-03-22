@@ -76,3 +76,4 @@ function activate(context) {
     context.subscriptions.push(cmd);
 }
 function deactivate() { }
+//# sourceMappingURL=extension.js.map
