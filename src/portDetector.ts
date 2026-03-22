@@ -1,6 +1,6 @@
 import net from "net";
 
-const ports = [5173, 3000, 4200, 5500, 8080];
+const ports = [5173,5174, 3000,3001, 4200, 5500, 8080];
 
 export async function detectPort(): Promise<number | null> {
   for (const port of ports) {

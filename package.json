@@ -2,7 +2,8 @@
   "name": "pocket-preview",
   "displayName": "pocket-preview",
   "description": "a live preview setup for quick access oven any network or phone",
-  "version": "0.0.3",
+  "icon": "public/icon.png",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.110.0"
   },

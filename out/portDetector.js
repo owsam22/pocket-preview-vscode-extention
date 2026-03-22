@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectPort = detectPort;
 const net_1 = __importDefault(require("net"));
-const ports = [5173, 3000, 4200, 5500, 8080];
+const ports = [5173, 5174, 3000, 3001, 4200, 5500, 8080];
 async function detectPort() {
     for (const port of ports) {
         const isOpen = await new Promise((resolve) => {
